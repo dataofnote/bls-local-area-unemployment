@@ -9,15 +9,18 @@ DIRS = {
     :published => DATA_DIR,
 }
 
-
-
-
 P_FILES = Hash[{
 
     fips: 'fips.csv',
 
 }.map{|k, v| [k, DATA_DIR / v ] }]
 
+I_FILES = Hash[{
+    counties_states_unadjusted: 'counties-states-unadjusted.csv',
+    counties_states_unadjusted_averages: 'counties-states-unadjusted-averages.csv',
+    states_seasonal: 'states-seasonally-adjusted.csv',
+    states_seasonal_averages: 'states-seasonally-adjusted-averages.csv',
+}.map{|k, v| [k, DIRS[:compiled] / v ] }]
 
 
 desc 'Setup the directories'
@@ -28,14 +31,51 @@ task :setup do
     end
 end
 
-desc 'counties extracted'
-fn = DIRS[:compiled].join('counties-unemployment.csv')
-file fn do
-    sh ["python",
-            SCRIPTS_DIR / 'extract_county_unemployment.py',
-            DIRS[:fetched] / 'la.data.64.County',
-            '>', fn].join(" ")
+desc 'counties and states average annual unemployment, unadjusted'
+file I_FILES[:counties_states_unadjusted_averages] => I_FILES[:counties_states_unadjusted] do
+    sh [
+        "python",
+        SCRIPTS_DIR / 'calculate_averages.py',
+        I_FILES[:counties_states_unadjusted],
+        '>', I_FILES[:counties_states_unadjusted_averages]].join(" ")
 end
+
+desc 'counties and states extracted'
+file I_FILES[:counties_states_unadjusted] do
+    sh [
+        "cat", DIRS[:fetched] / 'la.data.64.County',
+        DIRS[:fetched] / 'la.data.2.AllStatesU',
+        '|', "python",
+        SCRIPTS_DIR / 'extract_data.py', '-',
+        '>', I_FILES[:counties_states_unadjusted]].join(" ")
+end
+
+
+
+
+desc 'states extracted, averaged yearly'
+file I_FILES[:states_seasonal_averages] => I_FILES[:states_seasonal] do
+    sh [
+        "python",
+        SCRIPTS_DIR / 'calculate_averages.py',
+        I_FILES[:states_seasonal],
+        '--seasonal',
+        '>', I_FILES[:states_seasonal_averages]].join(" ")
+end
+
+
+desc 'states extracted, adjusted data only'
+file I_FILES[:states_seasonal] do
+    sh [
+        "python",
+        SCRIPTS_DIR / 'extract_data.py',
+        DIRS[:fetched] / 'la.data.3.AllStatesS',
+        '--seasonal',
+        '>', I_FILES[:states_seasonal]].join(" ")
+end
+
+
+
 
 
 desc "Fetch FIPS lookups from BLS"

@@ -357,11 +357,9 @@ File Name:  la.period
 
 Field #/Data Element		Length		Value (Example)
 
-1.  period			3		M01
-
-2.  period_abbr			5		JAN
-				
-3.  period_name			20		January
+period			3		M01
+period_abbr			5		JAN
+period_name			20		January
 
 =========================================================================================
 Section 7
@@ -372,20 +370,13 @@ LOCAL AREA UNEMPLOYMENT STATISTICS (LA) DATABASE ELEMENTS
 
 Data Element    Length          Value (Example)          	Description
 
-area_code       15              ST0100000000000		Code identifying the geographic
-							area to which the data refer.
-							
-area_text       80         	Alabama   		Name of the geographic area to
-		           			  	which the data refer.
-				
-area_type_code  1               A		        Unique code defining the type of
-							area (A through N).
+area_code       15              ST0100000000000		Code identifying the geographicarea to which the data refer.
+area_text       80         	Alabama   		Name of the geographic area to which the data refer.
+area_type_code  1               A		        Unique code defining the type of area (A through N).
 				
 area_type_text  80         	Statewide  		Name of the area type.
 				
-begin_period    3               M01	 		Identifies first data observation
-							within the first year for which data
-							are available for a given series.
+begin_period    3               M01	 		Identifies first data observation within the first year for which data are available for a given series.
 
 begin_year      4               1976            	Identifies first year for which data
 							are available for a given series.
