@@ -10,8 +10,11 @@ DIRS = {
 }
 
 P_FILES = Hash[{
-
     fips: 'fips.csv',
+    counties_states_unadjusted: 'bls-local-area-unemployment-counties-states-unadjusted.csv',
+    counties_states_unadjusted_averages: 'bls-local-area-unemployment-counties-states-unadjusted-averages.csv',
+    states_seasonal: 'bls-local-area-unemployment-states-seasonally-adjusted.csv',
+    states_seasonal_averages: 'bls-local-area-unemployment-states-seasonally-adjusted-averages.csv',
 
 }.map{|k, v| [k, DATA_DIR / v ] }]
 
@@ -30,6 +33,20 @@ task :setup do
         puts "Created directory: #{p}"
     end
 end
+
+namespace :publish do
+    P_FILES.each_pair do |key, pname|
+        if I_FILES[key]
+            srcname = I_FILES[key]
+            desc "Publish #{key}"
+            file pname => srcname do
+                sh "cp #{srcname} #{pname}"
+            end
+        end
+    end
+end
+
+
 
 desc 'counties and states average annual unemployment, unadjusted'
 file I_FILES[:counties_states_unadjusted_averages] => I_FILES[:counties_states_unadjusted] do
